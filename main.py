@@ -2,8 +2,21 @@ from fastapi import FastAPI
 from lib import pseudo_random
 from typing import List, Union
 
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+origins = [
+    "*"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 randomizer = pseudo_random.Stock()
 
 
