@@ -21,26 +21,53 @@ app.add_middleware(
     allow_headers=["*"],
 )
 randomizer = pseudo_random.Stock()
+token = None
 
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+@app.post("/set_auth")
+async def root(a_token: str):
+    global token
+    if token:
+        return {"message": "already set"}
+    else:
+        token = a_token
+        return {"message": "set"}
+
+@app.post('/get_all')
+async def get_current_dict(a_token: str):
+    if a_token == token:
+        return randomizer.products
+    else:
+        return {"message": "invalid token"}
 
 
 @app.post("/items")
-async def init_products(items: List[pseudo_random.Product]):
-    randomizer.products = items
+async def init_products(items: List[pseudo_random.Product], a_token: str):
+    if a_token == token:
+        randomizer.products = items
+        return
+    else:
+        return {"message": "invalid token"}
 
-@app.get("/respawn")
-async def back_to_defaults():
-    global randomizer
-    randomizer = pseudo_random.Stock()
+
+@app.post("/respawn")
+async def back_to_defaults(a_token: str):
+    if a_token == token:
+        global randomizer
+        randomizer = pseudo_random.Stock()
+        return
+    else:
+        return {"message": "invalid token"}
+
 
 @app.post("/settings")
-async def set_settings(settings: pseudo_random.Settings):
-    randomizer.calls_limit = settings.calls_limit
-    randomizer.rare_per_limit = settings.rare_per_limit
+async def set_settings(settings: pseudo_random.Settings, a_token: str):
+    if a_token == token:
+        randomizer.calls_limit = settings.calls_limit
+        randomizer.rare_per_limit = settings.rare_per_limit
+        return
+    else:
+        return {"message": "invalid token"}
 
 
 @app.get("/spin")
