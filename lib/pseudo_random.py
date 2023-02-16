@@ -9,11 +9,16 @@ from typing_extensions import TypedDict
 class Product:
     name: str
     quantity: int
-    rarity: bool = False
+    rarity: bool = None
 
     def __post_init__(self):
-        if self.quantity == 1:
-            self.rarity = True
+        if self.rarity is None:
+            if self.quantity == 1:
+                self.rarity = True
+            else:
+                self.rarity = False
+        else:
+            pass
 
 
 @dataclass
@@ -94,7 +99,6 @@ class Stock:
                     continue
         else:
             raise Exception
-
 
 
 
